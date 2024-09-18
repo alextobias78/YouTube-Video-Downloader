@@ -16,8 +16,8 @@ Before you begin, ensure you have met the following requirements:
 1. **Clone the repository:**
 
     ```sh
-    git clone <repository_link>
-    cd <repository_directory>
+    git clone https://github.com/alextobias78/YouTube-Video-Downloader.git
+    cd YouTube-Video-Downloader
     ```
 
 2. **Install dependencies:**
