@@ -56,7 +56,7 @@ class YouTubeDownloader(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("YouTube Video Downloader")
-        self.setFixedSize(600, 450)
+        self.setFixedSize(800, 600)
         self.init_ui()
         self.ydl_opts = {
             'progress_hooks': [self.emit_progress],
@@ -81,29 +81,58 @@ class YouTubeDownloader(QtWidgets.QMainWindow):
         self.setCentralWidget(central_widget)
 
         layout = QtWidgets.QVBoxLayout()
+        layout.setSpacing(20)
+        layout.setContentsMargins(40, 40, 40, 40)
+
+        # Title
+        title_label = QtWidgets.QLabel("YouTube Video Downloader")
+        title_label.setAlignment(QtCore.Qt.AlignCenter)
+        title_label.setStyleSheet("""
+            font-size: 28px;
+            font-weight: bold;
+            color: #E50914;
+            margin-bottom: 20px;
+        """)
+        layout.addWidget(title_label)
 
         # URL Input
         url_label = QtWidgets.QLabel("Enter YouTube Video URL:")
-        url_label.setFont(QtGui.QFont("Arial", 14))
+        url_label.setStyleSheet("font-size: 16px; color: #FFFFFF;")
         layout.addWidget(url_label)
 
         self.url_entry = QtWidgets.QLineEdit()
         self.url_entry.setPlaceholderText("https://www.youtube.com/watch?v=example")
-        self.url_entry.setFont(QtGui.QFont("Arial", 12))
+        self.url_entry.setStyleSheet("""
+            QLineEdit {
+                font-size: 14px;
+                padding: 10px;
+                border: 2px solid #444444;
+                border-radius: 5px;
+                background-color: #2A2A2A;
+                color: #FFFFFF;
+            }
+            QLineEdit:focus {
+                border-color: #E50914;
+            }
+        """)
         layout.addWidget(self.url_entry)
 
         # Fetch Button
         fetch_button = QtWidgets.QPushButton("Fetch Video Info")
         fetch_button.setStyleSheet("""
             QPushButton {
-                background-color: #007BFF; 
+                background-color: #E50914; 
                 color: white; 
-                font-size: 14px; 
-                padding: 10px;
+                font-size: 16px; 
+                font-weight: bold;
+                padding: 12px;
                 border-radius: 5px;
             }
             QPushButton:hover {
-                background-color: #0056b3;
+                background-color: #F40612;
+            }
+            QPushButton:pressed {
+                background-color: #C2000B;
             }
         """)
         fetch_button.clicked.connect(self.start_fetch_info)
@@ -111,24 +140,49 @@ class YouTubeDownloader(QtWidgets.QMainWindow):
 
         # Resolution Selection
         resolution_label = QtWidgets.QLabel("Select Resolution:")
-        resolution_label.setFont(QtGui.QFont("Arial", 14))
+        resolution_label.setStyleSheet("font-size: 16px; color: #FFFFFF; margin-top: 20px;")
         layout.addWidget(resolution_label)
 
         self.resolution_combo = QtWidgets.QComboBox()
+        self.resolution_combo.setStyleSheet("""
+            QComboBox {
+                font-size: 14px;
+                padding: 8px;
+                border: 2px solid #444444;
+                border-radius: 5px;
+                background-color: #2A2A2A;
+                color: #FFFFFF;
+            }
+            QComboBox::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 30px;
+                border-left-width: 1px;
+                border-left-color: #444444;
+                border-left-style: solid;
+            }
+            QComboBox::down-arrow {
+                image: url(down_arrow.png);
+            }
+        """)
         layout.addWidget(self.resolution_combo)
 
         # Download Button
         download_button = QtWidgets.QPushButton("Download")
         download_button.setStyleSheet("""
             QPushButton {
-                background-color: #28a745; 
+                background-color: #00C851; 
                 color: white; 
-                font-size: 14px; 
-                padding: 10px;
+                font-size: 16px; 
+                font-weight: bold;
+                padding: 12px;
                 border-radius: 5px;
             }
             QPushButton:hover {
-                background-color: #218838;
+                background-color: #00E25B;
+            }
+            QPushButton:pressed {
+                background-color: #00A041;
             }
         """)
         download_button.clicked.connect(self.start_download)
@@ -136,16 +190,43 @@ class YouTubeDownloader(QtWidgets.QMainWindow):
 
         # Progress Bar
         self.progress_bar = QtWidgets.QProgressBar()
-        self.progress_bar.setValue(0)
+        self.progress_bar.setStyleSheet("""
+            QProgressBar {
+                border: 2px solid #444444;
+                border-radius: 5px;
+                text-align: center;
+                color: #FFFFFF;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QProgressBar::chunk {
+                background-color: #E50914;
+                width: 10px;
+                margin: 0.5px;
+            }
+        """)
+        self.progress_bar.setTextVisible(True)
+        self.progress_bar.setFormat("%p%")
         layout.addWidget(self.progress_bar)
 
         # Status Label
         self.status_label = QtWidgets.QLabel("")
         self.status_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.status_label.setFont(QtGui.QFont("Arial", 12))
+        self.status_label.setStyleSheet("""
+            font-size: 14px;
+            color: #FFFFFF;
+            margin-top: 10px;
+        """)
         layout.addWidget(self.status_label)
 
         central_widget.setLayout(layout)
+
+        # Set the window background
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #1A1A1A;
+            }
+        """)
 
     def validate_ffmpeg(self):
         """Check if FFmpeg is installed and accessible."""
@@ -315,7 +396,25 @@ class YouTubeDownloader(QtWidgets.QMainWindow):
 
 def create_ui():
     app = QtWidgets.QApplication(sys.argv)
-    app.setStyle('Fusion')  # Optional: Set a modern UI style
+    app.setStyle('Fusion')
+    
+    # Set the application-wide dark palette
+    dark_palette = QtGui.QPalette()
+    dark_palette.setColor(QtGui.QPalette.Window, QtGui.QColor(26, 26, 26))
+    dark_palette.setColor(QtGui.QPalette.WindowText, QtCore.Qt.white)
+    dark_palette.setColor(QtGui.QPalette.Base, QtGui.QColor(42, 42, 42))
+    dark_palette.setColor(QtGui.QPalette.AlternateBase, QtGui.QColor(66, 66, 66))
+    dark_palette.setColor(QtGui.QPalette.ToolTipBase, QtCore.Qt.white)
+    dark_palette.setColor(QtGui.QPalette.ToolTipText, QtCore.Qt.white)
+    dark_palette.setColor(QtGui.QPalette.Text, QtCore.Qt.white)
+    dark_palette.setColor(QtGui.QPalette.Button, QtGui.QColor(53, 53, 53))
+    dark_palette.setColor(QtGui.QPalette.ButtonText, QtCore.Qt.white)
+    dark_palette.setColor(QtGui.QPalette.BrightText, QtCore.Qt.red)
+    dark_palette.setColor(QtGui.QPalette.Link, QtGui.QColor(42, 130, 218))
+    dark_palette.setColor(QtGui.QPalette.Highlight, QtGui.QColor(42, 130, 218))
+    dark_palette.setColor(QtGui.QPalette.HighlightedText, QtCore.Qt.black)
+    app.setPalette(dark_palette)
+    
     window = YouTubeDownloader()
     window.show()
     sys.exit(app.exec_())
